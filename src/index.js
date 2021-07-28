@@ -5,6 +5,7 @@ const ramenDetail = document.querySelector("div#ramen-detail")
 const ramenRatingForm = document.querySelector("#ramen-rating")
 
 function fetchAllRamens(){
+    resetRamenMenu()
     fetch("http://localhost:3000/ramens")
     .then(r => r.json())
     .then(ramens => {
@@ -18,6 +19,21 @@ function fetchAllRamens(){
 
 fetchAllRamens()
 
+function fetchCurrentRamens(ramenObj){
+    resetRamenMenu()
+    fetch("http://localhost:3000/ramens")
+    .then(r => r.json())
+    .then(ramens => {
+        displayedRamen = ramens.find((ramen)=> {return ramen.id === ramenObj.id})
+        console.log(displayedRamen)
+        renderRamenDetail(displayedRamen)
+
+        ramens.forEach(ramen => {
+            renderRamen(ramen)
+        })
+    })
+}
+
 const deleteBtn = document.createElement("button")
 deleteBtn.textContent = "Delete"
 
@@ -28,7 +44,6 @@ function renderRamen(ramen){
 
     img.addEventListener('click', ()=> {
         renderRamenDetail(ramen)
-        deleteBtn.dataset.id = ramen.id
     })
 
     ramenMenu.append(img)
@@ -39,6 +54,8 @@ const name = document.querySelector(".name")
 const restaurant = document.querySelector(".restaurant")
 
 function renderRamenDetail(ramen){
+    const div = document.createElement("div")
+    deleteBtn.dataset.id = ramen.id
     ramenRatingForm.dataset.id = ramen.id
 
     detailImage.src = ramen.image
@@ -49,14 +66,15 @@ function renderRamenDetail(ramen){
     ramenRatingForm.rating.value = ramen.rating
     ramenRatingForm.comment.value = ramen.comment
 
-    ramenRatingForm.append(deleteBtn)
+    //div.append(ramenRatingForm)
+    div.append(deleteBtn)
+    ramenDetail.append(div)
 }
 
 deleteBtn.addEventListener('click', () => {
     fetch(`http://localhost:3000/ramens/${deleteBtn.dataset.id}`, {
         method: "DELETE"
     }).then(_ => {
-        resetRamenMenu()
         fetchAllRamens()
     }
     )
@@ -79,10 +97,8 @@ ramenRatingForm.addEventListener('submit', (event)=> {
             "Accept": "application/json"
         },
         body: JSON.stringify(updates)
-    }).then(_ => {
-        resetRamenMenu()
-        fetchAllRamens()
-    })
+    }).then(r => r.json())
+    .then(ramen => {fetchCurrentRamens(ramen)})
 })
 
 function resetRamenMenu(){
@@ -109,11 +125,10 @@ newRamenForm.addEventListener('submit', (event) => {
             "Accept": "application/json"
         },
         body: JSON.stringify(newRamen)
-    }).then(_ => {
-        resetRamenMenu()
-        fetchAllRamens()
-    })
-    
+    }).then(r => r.json())
+    .then(ramen => {
+        fetchCurrentRamens(ramen)
+    })  
 
     newRamenForm.reset()
 })
