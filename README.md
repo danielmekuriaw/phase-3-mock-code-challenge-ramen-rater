@@ -45,7 +45,7 @@ These deliverables are not required to pass the code challenge, but if you have 
 
 As a user, I can:
 
-- See the details for the first ramen as soon as the page loads (without clicking on an image)
+- See the details for the first ramen as soon as the page loads (without clicking on an image) [DONE]
 - Create a new ramen. You can add this form to the `index.html` file to get started:
 
 ```html
